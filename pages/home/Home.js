@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
+import * as Progress from 'react-native-progress';
 
 //Firebase Configuration
 import firebase from '../../components/firebase';
 
 //actions
-import { setToken, getEvents } from '../../actions/events';
+import { getEvents } from '../../actions/events';
 import { clearUser } from '../../actions/user';
 
 //style
@@ -17,8 +17,20 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true
+      userRef: firebase
+        .database()
+        .ref('users')
+        .child(this.props.user.uid)
     };
+  }
+
+  componentDidMount() {
+    this.state.userRef.once('value').then(data => {
+      if (data.val() !== null) {
+        console.log('called to check the user data.......', data.val().token);
+        this.props.getEvents(2, data.val().token);
+      }
+    });
   }
 
   async signOut() {
@@ -34,7 +46,9 @@ class Home extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text> Home </Text>
+        {/* {this.props.loading ? (
+          <Progress.CircleSnail color={['red', 'green', 'blue']} />
+        ) : ( */}
         <TouchableOpacity
           onPress={() => {
             this.signOut();
@@ -42,6 +56,7 @@ class Home extends Component {
         >
           <Text>SignOut</Text>
         </TouchableOpacity>
+        {/* )} */}
       </View>
     );
   }
@@ -56,7 +71,7 @@ const mapStateToProps = ({ events, user }) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  getEvents: token => dispatch(getEvents(token)),
+  getEvents: (page, token) => dispatch(getEvents(page, token)),
   clearUser: () => dispatch(clearUser())
 });
 

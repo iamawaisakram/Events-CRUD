@@ -13,7 +13,7 @@ import Signup from './components/Signup';
 import firebase from '../../components/firebase';
 
 //action
-import { setToken } from '../../actions/events';
+import { setToken, setRegisterToken } from '../../actions/events';
 import { setUser } from '../../actions/user';
 
 //style
@@ -97,6 +97,7 @@ class CreateAccount extends Component {
         // saving error
       }
       await this.props.setToken(`${email}`, `${password}`);
+
       firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
@@ -120,6 +121,7 @@ class CreateAccount extends Component {
   };
 
   handleSignupSubmit = async () => {
+    const { email, password } = this.state;
     if (this.isFormValid()) {
       this.setState({ errors: [], loading: true });
       try {
@@ -128,6 +130,7 @@ class CreateAccount extends Component {
       } catch (e) {
         // saving error
       }
+      await this.props.setRegisterToken(`${email}`, `${password}`);
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
@@ -171,7 +174,8 @@ class CreateAccount extends Component {
   saveUser = createdUser => {
     return this.state.usersRef.child(createdUser.user.uid).set({
       name: createdUser.user.displayName,
-      avatar: createdUser.user.photoURL
+      avatar: createdUser.user.photoURL,
+      token: this.props.token
     });
   };
 
@@ -250,12 +254,20 @@ class CreateAccount extends Component {
   }
 }
 
+const mapStateToProps = ({ events }) => {
+  return {
+    token: events.token
+  };
+};
+
 const mapDispatchToProps = dispatch => ({
   setUser: user => dispatch(setUser(user)),
-  setToken: (email, password) => dispatch(setToken(email, password))
+  setToken: (email, password) => dispatch(setToken(email, password)),
+  setRegisterToken: (email, password) =>
+    dispatch(setRegisterToken(email, password))
 });
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(CreateAccount);
