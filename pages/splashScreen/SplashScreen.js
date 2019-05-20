@@ -35,7 +35,7 @@ class SplashScreen extends Component {
 
   startAnimation = () => {
     Animated.timing(this.state.animation, {
-      toValue: -250,
+      toValue: -220,
       duration: 1000,
       useNativeDriver: true
     }).start();

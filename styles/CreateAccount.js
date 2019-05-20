@@ -46,9 +46,7 @@ export default StyleSheet.create({
     zIndex: 111111,
     width: wp('30%'),
     height: hp('8.5%'),
-    borderRadius: wp('5%'),
-    borderWidth: 1,
-    borderColor: 'brown'
+    borderRadius: wp('5%')
   },
   loginBtn: {
     width: wp('30%'),
@@ -61,13 +59,11 @@ export default StyleSheet.create({
   changeToSignupButton: {
     backgroundColor: 'transparent',
     position: 'absolute',
-    top: hp('10%'),
+    top: hp('8%'),
     right: wp('8%'),
     width: wp('35%'),
-    height: hp('10%'),
-    borderBottomLeftRadius: wp('40%'),
-    borderWidth: 1,
-    borderColor: 'brown'
+    height: hp('13%'),
+    borderBottomLeftRadius: wp('40%')
   },
   changeToLoginButton: {
     backgroundColor: 'transparent',
@@ -76,8 +72,6 @@ export default StyleSheet.create({
     left: wp('8%'),
     width: wp('35%'),
     height: hp('10%'),
-    borderBottomLeftRadius: wp('40%'),
-    borderWidth: 1,
-    borderColor: 'brown'
+    borderBottomLeftRadius: wp('40%')
   }
 });

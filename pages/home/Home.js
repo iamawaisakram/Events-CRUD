@@ -20,7 +20,7 @@ class Home extends Component {
       userRef: firebase
         .database()
         .ref('users')
-        .child(this.props.user.uid)
+        .child(firebase.auth().currentUser.uid)
     };
   }
 
