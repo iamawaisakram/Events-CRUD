@@ -25,10 +25,10 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    this.state.userRef.once('value').then(data => {
+    this.state.userRef.once('value').then(async data => {
       if (data.val() !== null) {
         console.log('called to check the user data.......', data.val().token);
-        this.props.getEvents(2, data.val().token);
+        await this.props.getEvents(2, data.val().token);
       }
     });
   }
@@ -46,17 +46,17 @@ class Home extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {/* {this.props.loading ? (
+        {this.props.loading ? (
           <Progress.CircleSnail color={['red', 'green', 'blue']} />
-        ) : ( */}
-        <TouchableOpacity
-          onPress={() => {
-            this.signOut();
-          }}
-        >
-          <Text>SignOut</Text>
-        </TouchableOpacity>
-        {/* )} */}
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              this.signOut();
+            }}
+          >
+            <Text>SignOut</Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
