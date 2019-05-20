@@ -16,6 +16,9 @@ import SplashScreen from './pages/splashScreen/SplashScreen';
 //Create account Screen
 import CreateAccount from './pages/createAccount/CreateAccount';
 
+//Home
+import Home from './pages/home/Home';
+
 //Sell product
 import Ad from './pages/adPage/Ad';
 
@@ -45,7 +48,8 @@ const AppStack = createStackNavigator(
   {
     SplashScreen,
     CreateAccount,
-    Ad
+    Ad,
+    Home
   },
   {
     initialRouteName: 'SplashScreen',

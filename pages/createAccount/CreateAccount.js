@@ -3,6 +3,7 @@ import { View, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 import md5 from 'md5';
+import AsyncStorage from '@react-native-community/async-storage';
 
 //Component
 import Login from './components/Login';
@@ -84,9 +85,15 @@ class CreateAccount extends Component {
     return !email.length || !password.length || !confirmPassword.length;
   };
 
-  handleLoginSubmit = () => {
+  handleLoginSubmit = async () => {
     const { email, password } = this.state;
     if (this.isFormValidLogin(email, password)) {
+      try {
+        await AsyncStorage.setItem('email', `${email}`);
+        await AsyncStorage.setItem('password', `${password}`);
+      } catch (e) {
+        // saving error
+      }
       this.setState({ errors: [], loading: true });
       firebase
         .auth()
@@ -97,7 +104,7 @@ class CreateAccount extends Component {
           this.setState({
             loading: false
           });
-          // this.props.navigation.navigate('TabBar');
+          this.props.navigation.navigate('Home');
         })
         .catch(err => {
           this.setState({
@@ -110,9 +117,15 @@ class CreateAccount extends Component {
     }
   };
 
-  handleSignupSubmit = () => {
+  handleSignupSubmit = async () => {
     if (this.isFormValid()) {
       this.setState({ errors: [], loading: true });
+      try {
+        await AsyncStorage.setItem('email', `${email}`);
+        await AsyncStorage.setItem('password', `${password}`);
+      } catch (e) {
+        // saving error
+      }
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
@@ -131,7 +144,7 @@ class CreateAccount extends Component {
                 this.props.setUser(firebase.auth().currentUser);
               });
               this.setState({ loading: false });
-              // this.props.navigation.navigate('TabBar');
+              this.props.navigation.navigate('Home');
             })
             .catch(err => {
               console.log(err);
@@ -173,7 +186,6 @@ class CreateAccount extends Component {
       confirmPassword,
       loading
     } = this.state;
-    console.log('called........', this.state);
     return (
       <View style={styles.container}>
         <FastImage
