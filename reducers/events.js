@@ -1,10 +1,11 @@
-import { SET_DATA } from '../utilities/keys';
+import { SET_DATA, SET_TOKEN } from '../utilities/keys';
 
 const initialState = {
   events: null,
   currentPage: 1,
   lastPage: null,
-  loading: true
+  loading: true,
+  token: null
 };
 
 export default function events(state = initialState, action) {
@@ -17,6 +18,8 @@ export default function events(state = initialState, action) {
         lastPage: action.data.last_page,
         loading: false
       };
+    case SET_TOKEN:
+      return { ...state, token: action.token };
 
     default:
       return state;

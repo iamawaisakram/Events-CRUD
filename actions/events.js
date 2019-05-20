@@ -1,6 +1,28 @@
-import { SET_DATA } from '../utilities/keys';
+import axios from 'axios';
+
+//keys
+import { SET_DATA, SET_TOKEN } from '../utilities/keys';
 
 let data = {};
+
+export const setToken = (email, password) => {
+  console.log('called......2', email, password);
+  data = {
+    email: email,
+    password: password
+  };
+  return dispatch => {
+    return axios
+      .post(`http://buzzevents.co/public/api/auth/login`, data)
+      .then(response => {
+        console.log('called......2', data, response.data);
+        dispatch(setTokenValue(response.data.token));
+      })
+      .catch(error => {
+        throw error;
+      });
+  };
+};
 
 export const getEvents = (page, token) => {
   return dispatch => {
@@ -12,7 +34,6 @@ export const getEvents = (page, token) => {
         dispatch(setValues(response.data));
       })
       .catch(error => {
-        throwErrorAlert();
         throw error;
       });
   };
@@ -22,5 +43,12 @@ function setValues(data) {
   return {
     type: SET_DATA,
     data
+  };
+}
+
+function setTokenValue(token) {
+  return {
+    type: SET_TOKEN,
+    token
   };
 }

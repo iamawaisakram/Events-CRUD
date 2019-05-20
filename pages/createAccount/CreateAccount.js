@@ -13,7 +13,8 @@ import Signup from './components/Signup';
 import firebase from '../../components/firebase';
 
 //action
-import { setTabBarScreen, setUser } from '../../actions/user';
+import { setToken } from '../../actions/events';
+import { setUser } from '../../actions/user';
 
 //style
 import styles from '../../styles/CreateAccount';
@@ -88,13 +89,14 @@ class CreateAccount extends Component {
   handleLoginSubmit = async () => {
     const { email, password } = this.state;
     if (this.isFormValidLogin(email, password)) {
+      this.setState({ errors: [], loading: true });
       try {
         await AsyncStorage.setItem('email', `${email}`);
         await AsyncStorage.setItem('password', `${password}`);
       } catch (e) {
         // saving error
       }
-      this.setState({ errors: [], loading: true });
+      await this.props.setToken(`${email}`, `${password}`);
       firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
@@ -249,8 +251,8 @@ class CreateAccount extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  setTabBarScreen: value => dispatch(setTabBarScreen(value)),
-  setUser: user => dispatch(setUser(user))
+  setUser: user => dispatch(setUser(user)),
+  setToken: (email, password) => dispatch(setToken(email, password))
 });
 
 export default connect(

@@ -18,10 +18,10 @@ class SplashScreen extends Component {
     this.state = {
       animation: new Animated.Value(0)
     };
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(async user => {
       if (user) {
-        this.props.setUser(user);
-        // this.props.navigation.navigate('TabBar');
+        await this.props.setUser(user);
+        this.props.navigation.navigate('Home');
       } else {
         this.props.navigation.navigate('CreateAccount');
         this.props.clearUser();
