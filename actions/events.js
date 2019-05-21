@@ -1,12 +1,14 @@
 import axios from 'axios';
 
+//Firebase Configuration
+import firebase from '../components/firebase';
+
 //keys
 import { SET_DATA, SET_TOKEN } from '../utilities/keys';
 
 let data = {};
 
-export const setToken = (email, password) => {
-  console.log('called......2', email, password);
+export const setToken = (email, password, userId) => {
   data = {
     email: email,
     password: password
@@ -14,9 +16,14 @@ export const setToken = (email, password) => {
   return dispatch => {
     return axios
       .post(`http://buzzevents.co/public/api/auth/login`, data)
-      .then(response => {
-        console.log('called......2', data, response.data);
-        dispatch(setTokenValue(response.data.token));
+      .then(async response => {
+        await firebase
+          .database()
+          .ref('users')
+          .child(userId)
+          .update({ token: response.data.token });
+
+        await dispatch(setTokenValue(response.data.token));
       })
       .catch(error => {
         throw error;
@@ -25,7 +32,6 @@ export const setToken = (email, password) => {
 };
 
 export const setRegisterToken = (email, password) => {
-  console.log('called......2', email, password);
   data = {
     email: email,
     password: password
@@ -34,7 +40,6 @@ export const setRegisterToken = (email, password) => {
     return axios
       .post(`http://buzzevents.co/public/api/auth/register`, data)
       .then(response => {
-        console.log('called......2', data, response.data);
         dispatch(setTokenValue(response.data.token));
       })
       .catch(error => {
@@ -50,11 +55,9 @@ export const getEvents = (page, token) => {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(response => {
-        console.log('called.......response', response);
         dispatch(setValues(response.data.data));
       })
       .catch(error => {
-        console.log('called.......error', error);
         throw error;
       });
   };

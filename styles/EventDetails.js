@@ -5,9 +5,6 @@ import {
   heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
 
-const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
-
 export default StyleSheet.create({
   container: {
     alignItems: 'center',

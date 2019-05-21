@@ -96,19 +96,22 @@ class CreateAccount extends Component {
       } catch (e) {
         // saving error
       }
-      await this.props.setToken(`${email}`, `${password}`);
 
       firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
-        .then(signedInUSer => {
-          console.log('called......', signedInUSer);
-          this.props.setUser(signedInUSer);
-          this.setState({
-            loading: false
-          });
-          this.props.navigation.navigate('Home');
+        .then(async signedInUSer => {
+          await this.props.setUser(signedInUSer);
+          await this.props.setToken(
+            `${email}`,
+            `${password}`,
+            signedInUSer.user.uid
+          );
+          if (this.props.token !== null) {
+            this.props.navigation.navigate('Home');
+          }
         })
+
         .catch(err => {
           this.setState({
             errors: this.state.errors.concat(err),
@@ -135,7 +138,6 @@ class CreateAccount extends Component {
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(createdUser => {
-          console.log('called......', createdUser);
           createdUser.user
             .updateProfile({
               displayName: this.state.email.split('@')[0],
@@ -144,12 +146,11 @@ class CreateAccount extends Component {
               )}?=identicon`
             })
             .then(() => {
-              this.saveUser(createdUser).then(() => {
-                console.log('User Saved..............');
-                this.props.setUser(firebase.auth().currentUser);
+              this.saveUser(createdUser).then(async () => {
+                await this.props.setUser(firebase.auth().currentUser);
+                this.setState({ loading: false });
+                this.props.navigation.navigate('Home');
               });
-              this.setState({ loading: false });
-              this.props.navigation.navigate('Home');
             })
             .catch(err => {
               console.log(err);
@@ -178,6 +179,12 @@ class CreateAccount extends Component {
       token: this.props.token
     });
   };
+
+  updateToken() {
+    this.state.user.child(firebase.auth().currentUser.uid).update({
+      token: this.props.token
+    });
+  }
 
   handleTextChange = (key, value) => {
     this.setState({ [key]: value });
@@ -254,15 +261,17 @@ class CreateAccount extends Component {
   }
 }
 
-const mapStateToProps = ({ events }) => {
+const mapStateToProps = ({ events, user }) => {
   return {
-    token: events.token
+    token: events.token,
+    user: user.currentUser
   };
 };
 
 const mapDispatchToProps = dispatch => ({
   setUser: user => dispatch(setUser(user)),
-  setToken: (email, password) => dispatch(setToken(email, password)),
+  setToken: (email, password, userId) =>
+    dispatch(setToken(email, password, userId)),
   setRegisterToken: (email, password) =>
     dispatch(setRegisterToken(email, password))
 });
