@@ -50,6 +50,20 @@ export default StyleSheet.create({
       }
     })
   },
+  refereshEvents: {
+    position: 'absolute',
+
+    ...Platform.select({
+      ios: {
+        right: wp('45%'),
+        bottom: wp('1.2%')
+      },
+      android: {
+        right: wp('45%'),
+        bottom: hp('3%')
+      }
+    })
+  },
   addEvent: {
     position: 'absolute',
 

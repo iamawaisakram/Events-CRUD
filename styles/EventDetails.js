@@ -38,30 +38,30 @@ export default StyleSheet.create({
 
     ...Platform.select({
       ios: {
-        left: wp('5%'),
+        left: wp('25%'),
         bottom: wp('3%')
       },
       android: {
-        left: wp('5%'),
-        bottom: hp('3.5%')
+        left: wp('25%'),
+        bottom: hp('3.7%')
       }
     })
   },
-  addEvent: {
+  goBack: {
     position: 'absolute',
 
     ...Platform.select({
       ios: {
-        right: wp('32%'),
+        left: wp('5%'),
         bottom: wp('1.2%')
       },
       android: {
-        right: wp('32%'),
+        left: wp('5%'),
         bottom: hp('3%')
       }
     })
   },
-  signOutButton: {
+  update: {
     width: wp('25%'),
     height: hp('5%'),
     backgroundColor: '#46381C',
@@ -81,58 +81,39 @@ export default StyleSheet.create({
       }
     })
   },
-  signoutText: {
+  updateText: {
     color: '#fff',
     fontSize: wp('4%')
   },
-  card: {
-    width: wp('90%'),
-    height: hp('48%'),
+  eventImage: {
+    height: hp('25%'),
+    width: wp('100%')
+  },
+  informationCell: {
+    width: wp('95%'),
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.3)',
-    marginTop: hp('3%'),
-    marginBottom: hp('3%')
+    flexDirection: 'row',
+    margin: 5,
+    borderColor: 'rgba(0,0,0,0.2)',
+    alignItems: 'center'
   },
-  cardBar: {
-    height: hp('8%'),
-    width: wp('90%'),
-    alignItems: 'center',
-    flexDirection: 'row'
+  venueCell: {
+    width: wp('95%'),
+    margin: 5,
+    alignItems: 'center'
   },
-  cardLogo: {
-    height: hp('6%'),
-    width: hp('6%'),
-    borderRadius: hp('3%'),
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.3)',
-    marginLeft: wp('3%')
-  },
-  cardName: {
-    color: '#D2A94E',
-    fontSize: wp('4%'),
-    marginLeft: wp('5%'),
-    fontWeight: 'bold'
-  },
-  cardDate: {
-    color: '#B4AEB5',
-    fontSize: wp('3%'),
-    marginLeft: wp('5%')
-  },
-  cardImage: {
-    height: hp('27%'),
-    width: wp('90%'),
-    justifyContent: 'center'
-  },
-  cardDescription: {
-    height: hp('13%'),
-    width: wp('90%'),
-    justifyContent: 'center'
-  },
-  cardDescriptionText: {
+  cellTitleText: {
+    padding: 15,
     color: '#000',
-    fontSize: wp('3%'),
-    marginLeft: wp('5%'),
     textAlign: 'left',
-    width: wp('80%')
+    fontSize: wp('4.5%'),
+    fontWeight: '300'
+  },
+  cellText: {
+    padding: 15,
+    color: '#000',
+    textAlign: 'left',
+    fontSize: wp('3.5%'),
+    fontWeight: '300'
   }
 });

@@ -9,16 +9,18 @@ import {
 import { connect } from 'react-redux';
 import * as Progress from 'react-native-progress';
 import FastImage from 'react-native-fast-image';
+import AsyncStorage from '@react-native-community/async-storage';
 
 //Firebase Configuration
 import firebase from '../../components/firebase';
 
 //actions
-import { getEvents } from '../../actions/events';
+import { getEvents, setCurrentEvent } from '../../actions/events';
 import { clearUser } from '../../actions/user';
 
 //icons
 import Icon from 'react-native-vector-icons/AntDesign';
+import IonIcon from 'react-native-vector-icons/Ionicons';
 
 //style
 import styles from '../../styles/Home';
@@ -33,12 +35,19 @@ class Home extends Component {
         .child(firebase.auth().currentUser.uid),
       eventsRef: firebase.database().ref('events')
     };
+    this.loadEvents();
   }
 
-  componentDidMount() {
+  async loadEvents() {
+    const email = await AsyncStorage.getItem('email');
+    const password = await AsyncStorage.getItem('password');
+    const userId = await AsyncStorage.getItem('uid');
+
+    console.log('called......', email, password, userId);
+
     this.state.userRef.once('value').then(async data => {
       if (data.val() !== null) {
-        await this.props.getEvents(2, data.val().token);
+        await this.props.getEvents(1, data.val().token);
       }
     });
   }
@@ -59,7 +68,14 @@ class Home extends Component {
       events &&
       events.map((event, i) => {
         return (
-          <TouchableOpacity key={i} style={styles.card}>
+          <TouchableOpacity
+            key={i}
+            style={styles.card}
+            onPress={async () => {
+              await this.props.setCurrentEvent(event);
+              this.props.navigation.navigate('EventDetails');
+            }}
+          >
             <View style={styles.cardBar}>
               <FastImage
                 style={styles.cardLogo}
@@ -67,7 +83,9 @@ class Home extends Component {
                 resizeMode={FastImage.resizeMode.contain}
               />
               <View>
-                <Text style={styles.cardName}>{event.name}</Text>
+                <Text style={styles.cardName}>
+                  {event.name.substring(0, 25)}
+                </Text>
                 <Text style={styles.cardDate}>{event.date_debut}</Text>
               </View>
             </View>
@@ -93,6 +111,23 @@ class Home extends Component {
           style={styles.scrollView}
           contentContainerStyle={styles.container}
         >
+          <View style={styles.topBar}>
+            <Text style={styles.barTitle}>Events</Text>
+            <TouchableOpacity style={styles.refereshEvents}>
+              <IonIcon name="ios-refresh" size={40} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.addEvent}>
+              <Icon name="plussquare" size={40} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.signOutButton}
+              onPress={() => {
+                this.signOut();
+              }}
+            >
+              <Text style={styles.signoutText}>Sign Out</Text>
+            </TouchableOpacity>
+          </View>
           {this.props.loading ? (
             <Progress.CircleSnail
               style={styles.loading}
@@ -100,20 +135,6 @@ class Home extends Component {
             />
           ) : (
             <View style={styles.cardListing}>
-              <View style={styles.topBar}>
-                <Text style={styles.barTitle}>Events</Text>
-                <TouchableOpacity style={styles.addEvent}>
-                  <Icon name="plussquare" size={40} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.signOutButton}
-                  onPress={() => {
-                    this.signOut();
-                  }}
-                >
-                  <Text style={styles.signoutText}>Sign Out</Text>
-                </TouchableOpacity>
-              </View>
               {this.DisplayEvents(this.props.events)}
             </View>
           )}
@@ -134,7 +155,8 @@ const mapStateToProps = ({ events, user }) => {
 
 const mapDispatchToProps = dispatch => ({
   getEvents: (page, token) => dispatch(getEvents(page, token)),
-  clearUser: () => dispatch(clearUser())
+  clearUser: () => dispatch(clearUser()),
+  setCurrentEvent: event => dispatch(setCurrentEvent(event))
 });
 
 export default connect(
