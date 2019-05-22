@@ -4,7 +4,8 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native';
 import * as Progress from 'react-native-progress';
 import FastImage from 'react-native-fast-image';
@@ -83,7 +84,20 @@ class EventCreate extends Component {
   }
 
   async uploadImage() {
-    const { storageRef, image, key } = this.state;
+    const {
+      storageRef,
+      image,
+      key,
+      name,
+      description,
+      date_debut,
+      date_fin,
+      debut_registration,
+      fin_registration,
+      placeName,
+      placeAddress,
+      placeContact
+    } = this.state;
     const Blob = RNFetchBlob.polyfill.Blob;
     const fs = RNFetchBlob.fs;
     window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
@@ -112,13 +126,34 @@ class EventCreate extends Component {
           .child(key)
           .child('event')
           .update({
-            pic: url
+            name: name,
+            description: description,
+            date_debut: date_debut,
+            date_fin: date_fin,
+            debut_registration: debut_registration,
+            fin_registration: fin_registration,
+            place: {
+              name: placeName,
+              addresse: placeAddress,
+              tel: placeContact
+            },
+            pic: url,
+            id: key
+          })
+          .catch(async err => {
+            if (err !== null) {
+              alert(err.message);
+              await this.setState({ loading: false });
+              return false;
+            }
           });
+      })
+      .then(() => {
+        this.props.navigation.navigate('Home');
       })
       .catch(error => {
         console.log(error);
         this.setState({ loading: false });
-        adRef.remove();
         Alert.alert(
           'Failure',
           'There seems to be an error while uploading the image!',
@@ -145,7 +180,8 @@ class EventCreate extends Component {
       fin_registration,
       placeName,
       placeAddress,
-      placeContact
+      placeContact,
+      image
     } = this.state;
 
     return name &&
@@ -156,12 +192,13 @@ class EventCreate extends Component {
       fin_registration &&
       placeName &&
       placeAddress &&
-      placeContact
+      placeContact &&
+      image
       ? true
       : false;
   }
 
-  async updateEvent() {
+  async createEvent() {
     const {
       name,
       description,
@@ -178,39 +215,8 @@ class EventCreate extends Component {
 
     await this.setState({ loading: true });
 
-    if (image.uri !== undefined) {
-      await this.uploadImage();
-    }
-
     if (this.formValidation()) {
-      await this.state.eventRef
-        .child(key)
-        .child('event')
-        .update({
-          name: name,
-          description: description,
-          date_debut: date_debut,
-          date_fin: date_fin,
-          debut_registration: debut_registration,
-          fin_registration: fin_registration,
-          place: {
-            name: placeName,
-            addresse: placeAddress,
-            tel: placeContact
-          }
-        })
-        .then(() => {
-          let timeout = setTimeout(() => {
-            this.props.navigation.navigate('Home');
-          }, 8000);
-        })
-        .catch(async err => {
-          if (err !== null) {
-            alert(err.message);
-            await this.setState({ loading: false });
-            return false;
-          }
-        });
+      await this.uploadImage();
     } else {
       alert('Kindly Fill in all values!');
       this.setState({ loading: false });
@@ -245,21 +251,6 @@ class EventCreate extends Component {
           style={styles.scrollView}
           contentContainerStyle={styles.container}
         >
-          <View style={styles.topBar}>
-            <Text style={styles.barTitle}>Create Event</Text>
-            <TouchableOpacity
-              style={styles.goBack}
-              onPress={() => this.navigateBack()}
-            >
-              <Icon name="home" size={40} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.update}
-              onPress={() => this.navigateBack()}
-            >
-              <Text style={styles.updateText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
           {this.state.loading ? (
             <Progress.CircleSnail
               style={styles.loading}
@@ -267,6 +258,21 @@ class EventCreate extends Component {
             />
           ) : (
             <View style={styles.cardListing}>
+              <View style={styles.topBar}>
+                <Text style={styles.barTitle}>Create Event</Text>
+                <TouchableOpacity
+                  style={styles.goBack}
+                  onPress={() => this.navigateBack()}
+                >
+                  <Icon name="home" size={40} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.update}
+                  onPress={() => this.navigateBack()}
+                >
+                  <Text style={styles.updateText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
               {image && (
                 <FastImage
                   style={styles.eventImage}
@@ -282,14 +288,14 @@ class EventCreate extends Component {
                     style={styles.changePicture}
                     onPress={() => this.pickSingle()}
                   >
-                    <Text>Update Image</Text>
+                    <Text>Upload Image</Text>
                   </TouchableOpacity>
                 </View>
               )}
               <View style={styles.venueCell}>
                 <Text style={styles.cellTitleText}>Title</Text>
                 <TextInput
-                  style={styles.cellTitleText}
+                  style={styles.cellTitleTextInput}
                   value={name}
                   onChangeText={value => this.setValue('name', value)}
                 />
@@ -378,7 +384,7 @@ class EventCreate extends Component {
                 <Text style={styles.cellTitleText}>Description</Text>
                 <View style={styles.informationCell}>
                   <TextInput
-                    style={styles.cellText}
+                    style={styles.cellTitleTextInput}
                     value={description}
                     multiline={true}
                     onChangeText={value => this.setValue('description', value)}
@@ -390,7 +396,7 @@ class EventCreate extends Component {
                 <View style={styles.informationCell}>
                   <Text style={styles.cellTitleText}>Name:</Text>
                   <TextInput
-                    style={styles.cellText}
+                    style={styles.cellTextAddress}
                     value={placeName}
                     onChangeText={value => this.setValue('placeName', value)}
                   />
@@ -398,7 +404,7 @@ class EventCreate extends Component {
                 <View style={styles.informationCell}>
                   <Text style={styles.cellTitleText}>Address:</Text>
                   <TextInput
-                    style={styles.cellText}
+                    style={styles.cellTextAddress}
                     value={placeAddress}
                     onChangeText={value => this.setValue('placeAddress', value)}
                   />
@@ -406,7 +412,7 @@ class EventCreate extends Component {
                 <View style={styles.informationCell}>
                   <Text style={styles.cellTitleText}>Contact:</Text>
                   <TextInput
-                    style={styles.cellText}
+                    style={styles.cellTextAddress}
                     value={placeContact}
                     onChangeText={value => this.setValue('placeContact', value)}
                   />
@@ -415,7 +421,7 @@ class EventCreate extends Component {
               <TouchableOpacity
                 style={styles.updateButton}
                 onPress={() => {
-                  this.updateEvent();
+                  this.createEvent();
                 }}
               >
                 <Text style={styles.buttonText}>Submit</Text>

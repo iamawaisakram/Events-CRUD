@@ -89,6 +89,22 @@ export default StyleSheet.create({
     height: hp('25%'),
     width: wp('100%')
   },
+  changePicture: {
+    right: wp('5%'),
+    top: hp('3%'),
+    width: wp('30%'),
+    height: hp('5%'),
+    // backgroundColor: 'rgb(70, 56, 28)',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    position: 'absolute',
+    borderRadius: wp('2%'),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  changePicText: {
+    color: '#fff',
+    fontSize: wp('3%')
+  },
   informationCell: {
     width: wp('95%'),
     borderWidth: 1,
@@ -109,12 +125,30 @@ export default StyleSheet.create({
     fontSize: wp('4.5%'),
     fontWeight: '300'
   },
+  cellTitleTextInput: {
+    padding: 15,
+    color: '#000',
+    textAlign: 'left',
+    fontSize: wp('4.5%'),
+    fontWeight: '300',
+    width: wp('95%'),
+    borderColor: 'rgba(0,0,0,0.2)',
+    borderWidth: 1
+  },
   cellText: {
     padding: 15,
     color: '#000',
     textAlign: 'left',
     fontSize: wp('3.5%'),
     fontWeight: '300'
+  },
+  cellTextAddress: {
+    padding: 15,
+    color: '#000',
+    textAlign: 'left',
+    fontSize: wp('3.5%'),
+    fontWeight: '300',
+    width: wp('68%')
   },
   deleteButton: {
     width: wp('50%'),

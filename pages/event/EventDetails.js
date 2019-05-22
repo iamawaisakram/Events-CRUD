@@ -124,17 +124,21 @@ class EventDetails extends Component {
                 <Text style={styles.cellTitleText}>Venue</Text>
                 <View style={styles.informationCell}>
                   <Text style={styles.cellTitleText}>Name:</Text>
-                  <Text style={styles.cellText}>{currentEvent.place.name}</Text>
+                  <Text style={styles.cellTextAddress}>
+                    {currentEvent.place.name}
+                  </Text>
                 </View>
                 <View style={styles.informationCell}>
                   <Text style={styles.cellTitleText}>Address:</Text>
-                  <Text style={styles.cellText}>
+                  <Text style={styles.cellTextAddress}>
                     {currentEvent.place.addresse}
                   </Text>
                 </View>
                 <View style={styles.informationCell}>
                   <Text style={styles.cellTitleText}>Contact:</Text>
-                  <Text style={styles.cellText}>{currentEvent.place.tel}</Text>
+                  <Text style={styles.cellTextAddress}>
+                    {currentEvent.place.tel}
+                  </Text>
                 </View>
               </View>
               <TouchableOpacity

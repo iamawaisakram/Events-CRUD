@@ -4,7 +4,8 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native';
 import * as Progress from 'react-native-progress';
 import FastImage from 'react-native-fast-image';
@@ -87,7 +88,19 @@ class EventUpdate extends Component {
   }
 
   async uploadImage() {
-    const { storageRef, image } = this.state;
+    const {
+      storageRef,
+      image,
+      name,
+      description,
+      date_debut,
+      date_fin,
+      debut_registration,
+      fin_registration,
+      placeName,
+      placeAddress,
+      placeContact
+    } = this.state;
     const Blob = RNFetchBlob.polyfill.Blob;
     const fs = RNFetchBlob.fs;
     window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
@@ -115,7 +128,28 @@ class EventUpdate extends Component {
           .child(this.props.currentEvent.id)
           .child('event')
           .update({
+            name: name,
+            description: description,
+            date_debut: date_debut,
+            date_fin: date_fin,
+            debut_registration: debut_registration,
+            fin_registration: fin_registration,
+            place: {
+              name: placeName,
+              addresse: placeAddress,
+              tel: placeContact
+            },
             pic: url
+          })
+          .then(() => {
+            this.props.navigation.navigate('Home');
+          })
+          .catch(async err => {
+            if (err !== null) {
+              alert(err.message);
+              await this.setState({ loading: false });
+              return false;
+            }
           });
       })
       .catch(error => {
@@ -176,47 +210,44 @@ class EventUpdate extends Component {
       placeAddress,
       placeContact,
       image,
-      imageUrl
     } = this.state;
 
     await this.setState({ loading: true });
 
     if (image.uri !== undefined) {
       await this.uploadImage();
-    }
-
-    if (this.formValidation()) {
-      await this.state.eventRef
-        .child(this.props.currentEvent.id)
-        .child('event')
-        .update({
-          name: name,
-          description: description,
-          date_debut: date_debut,
-          date_fin: date_fin,
-          debut_registration: debut_registration,
-          fin_registration: fin_registration,
-          place: {
-            name: placeName,
-            addresse: placeAddress,
-            tel: placeContact
-          }
-        })
-        .then(() => {
-          let timeout = setTimeout(() => {
-            this.props.navigation.navigate('Home');
-          }, 8000);
-        })
-        .catch(async err => {
-          if (err !== null) {
-            alert(err.message);
-            await this.setState({ loading: false });
-            return false;
-          }
-        });
     } else {
-      alert('Kindly Fill in all values!');
-      this.setState({ loading: false });
+      if (this.formValidation()) {
+        this.state.eventRef
+          .child(this.props.currentEvent.id)
+          .child('event')
+          .update({
+            name: name,
+            description: description,
+            date_debut: date_debut,
+            date_fin: date_fin,
+            debut_registration: debut_registration,
+            fin_registration: fin_registration,
+            place: {
+              name: placeName,
+              addresse: placeAddress,
+              tel: placeContact
+            }
+          })
+          .then(() => {
+            this.props.navigation.navigate('Home');
+          })
+          .catch(async err => {
+            if (err !== null) {
+              alert(err.message);
+              await this.setState({ loading: false });
+              return false;
+            }
+          });
+      } else {
+        alert('Kindly Fill in all values!');
+        this.setState({ loading: false });
+      }
     }
   }
 
@@ -247,24 +278,6 @@ class EventUpdate extends Component {
           style={styles.scrollView}
           contentContainerStyle={styles.container}
         >
-          <View style={styles.topBar}>
-            <Text style={styles.barTitle}>
-              {/* {currentEvent ? currentEvent.name.substring(0, 25) : 'Event'} */}
-              Update Event
-            </Text>
-            <TouchableOpacity
-              style={styles.goBack}
-              onPress={() => this.props.navigation.navigate('Home')}
-            >
-              <Icon name="home" size={40} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.update}
-              onPress={() => this.props.navigation.navigate('EventDetails')}
-            >
-              <Text style={styles.updateText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
           {this.state.loading ? (
             <Progress.CircleSnail
               style={styles.loading}
@@ -272,6 +285,24 @@ class EventUpdate extends Component {
             />
           ) : (
             <View style={styles.cardListing}>
+              <View style={styles.topBar}>
+                <Text style={styles.barTitle}>
+                  {/* {currentEvent ? currentEvent.name.substring(0, 25) : 'Event'} */}
+                  Update Event
+                </Text>
+                <TouchableOpacity
+                  style={styles.goBack}
+                  onPress={() => this.props.navigation.navigate('Home')}
+                >
+                  <Icon name="home" size={40} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.update}
+                  onPress={() => this.props.navigation.navigate('EventDetails')}
+                >
+                  <Text style={styles.updateText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
               <FastImage
                 style={styles.eventImage}
                 source={
@@ -289,7 +320,7 @@ class EventUpdate extends Component {
                   style={styles.changePicture}
                   onPress={() => this.pickSingle()}
                 >
-                  <Text>Update Image</Text>
+                  <Text style={styles.changePicText}>Update Image</Text>
                 </TouchableOpacity>
               </FastImage>
               <View style={styles.venueCell}>

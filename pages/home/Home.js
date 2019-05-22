@@ -91,7 +91,10 @@ class Home extends Component {
       events.map((event, i) => {
         const eventValue = event.event;
         const regex = 'appspot.com';
-        const urlValue = eventValue.pic.includes(regex);
+        let urlValue;
+        if (eventValue.pic !== undefined) {
+          urlValue = eventValue.pic.includes(regex);
+        }
         return (
           <TouchableOpacity
             key={i}
@@ -114,15 +117,17 @@ class Home extends Component {
                 <Text style={styles.cardDate}>{eventValue.date_debut}</Text>
               </View>
             </View>
-            <FastImage
-              style={styles.cardImage}
-              source={
-                urlValue
-                  ? { uri: eventValue.pic }
-                  : { uri: url + eventValue.pic }
-              }
-              resizeMode={FastImage.resizeMode.contain}
-            />
+            {eventValue.pic !== undefined && (
+              <FastImage
+                style={styles.cardImage}
+                source={
+                  urlValue
+                    ? { uri: eventValue.pic }
+                    : { uri: url + eventValue.pic }
+                }
+                resizeMode={FastImage.resizeMode.contain}
+              />
+            )}
             <View style={styles.cardDescription}>
               <Text style={styles.cardDescriptionText}>
                 {eventValue.description.substring(0, 100)}...
