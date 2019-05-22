@@ -90,6 +90,8 @@ class Home extends Component {
       events &&
       events.map((event, i) => {
         const eventValue = event.event;
+        const regex = 'appspot.com';
+        const urlValue = eventValue.pic.includes(regex);
         return (
           <TouchableOpacity
             key={i}
@@ -114,7 +116,11 @@ class Home extends Component {
             </View>
             <FastImage
               style={styles.cardImage}
-              source={{ uri: url + eventValue.pic }}
+              source={
+                urlValue
+                  ? { uri: eventValue.pic }
+                  : { uri: url + eventValue.pic }
+              }
               resizeMode={FastImage.resizeMode.contain}
             />
             <View style={styles.cardDescription}>
@@ -141,7 +147,23 @@ class Home extends Component {
         >
           <View style={styles.topBar}>
             <Text style={styles.barTitle}>Events</Text>
-            <TouchableOpacity style={styles.addEvent}>
+            {/* <TouchableOpacity
+              style={styles.refereshEvents}
+              onPress={() => this.referesh()}
+            >
+              {this.state.loading ? (
+                <Progress.CircleSnail
+                  // style={styles.loading}
+                  color={['white']}
+                />
+              ) : (
+                <IonIcon name="ios-refresh" size={40} color="#fff" />
+              )}
+            </TouchableOpacity> */}
+            <TouchableOpacity
+              style={styles.addEvent}
+              onPress={() => this.props.navigation.navigate('EventCreate')}
+            >
               <Icon name="plussquare" size={40} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity

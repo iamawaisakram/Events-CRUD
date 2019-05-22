@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import * as Progress from 'react-native-progress';
 import FastImage from 'react-native-fast-image';
-import { connect } from 'react-redux';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -23,36 +22,33 @@ import Icon from 'react-native-vector-icons/AntDesign';
 //style
 import styles from '../../styles/EventDetails';
 
-class EventUpdate extends Component {
+class EventCreate extends Component {
   constructor(props) {
     super(props);
-    const { currentEvent } = this.props;
     this.state = {
-      loading: true,
+      loading: false,
       eventRef: firebase.database().ref('events'),
       storageRef: firebase.storage().ref('images'),
-      name: currentEvent.name,
-      description: currentEvent.description,
-      date_debut: currentEvent.date_debut,
-      date_fin: currentEvent.date_fin,
-      debut_registration: currentEvent.debut_registration,
-      fin_registration: currentEvent.fin_registration,
-      placeName: currentEvent.place.name,
-      placeAddress: currentEvent.place.addresse,
-      placeContact: currentEvent.place.tel,
+      key: firebase
+        .database()
+        .ref('events')
+        .push().key,
+      name: '',
+      description: '',
+      date_debut: moment(new Date()).format('L'),
+      date_fin: moment(new Date()).format('L'),
+      debut_registration: moment(new Date()).format('L'),
+      fin_registration: moment(new Date()).format('L'),
+      placeName: '',
+      placeAddress: '',
+      placeContact: '',
       date_debut_moment: new Date(),
       date_fin_moment: new Date(),
       debut_registration_moment: new Date(),
       fin_registration_moment: new Date(),
-      image: currentEvent.pic,
+      image: null,
       imageUrl: ''
     };
-  }
-
-  componentDidMount() {
-    if (this.props.currentEvent !== null) {
-      this.setState({ loading: false });
-    }
   }
 
   setValue(key, value) {
@@ -87,7 +83,7 @@ class EventUpdate extends Component {
   }
 
   async uploadImage() {
-    const { storageRef, image } = this.state;
+    const { storageRef, image, key } = this.state;
     const Blob = RNFetchBlob.polyfill.Blob;
     const fs = RNFetchBlob.fs;
     window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
@@ -96,7 +92,8 @@ class EventUpdate extends Component {
     const imagePath = image.uri;
     let uploadBlob = null;
     let mime = 'image/jpg';
-    const imageRef = storageRef.child(`${this.props.currentEvent.id}`);
+
+    const imageRef = storageRef.child(key);
 
     fs.readFile(imagePath, 'base64')
       .then(data => {
@@ -112,7 +109,7 @@ class EventUpdate extends Component {
       })
       .then(async url => {
         await this.state.eventRef
-          .child(this.props.currentEvent.id)
+          .child(key)
           .child('event')
           .update({
             pic: url
@@ -176,7 +173,7 @@ class EventUpdate extends Component {
       placeAddress,
       placeContact,
       image,
-      imageUrl
+      key
     } = this.state;
 
     await this.setState({ loading: true });
@@ -187,7 +184,7 @@ class EventUpdate extends Component {
 
     if (this.formValidation()) {
       await this.state.eventRef
-        .child(this.props.currentEvent.id)
+        .child(key)
         .child('event')
         .update({
           name: name,
@@ -220,8 +217,12 @@ class EventUpdate extends Component {
     }
   }
 
+  async navigateBack() {
+    await this.state.eventRef.child(this.state.key).remove();
+    this.props.navigation.navigate('Home');
+  }
+
   render() {
-    const { currentEvent } = this.props;
     const {
       name,
       description,
@@ -238,9 +239,6 @@ class EventUpdate extends Component {
       placeContact,
       image
     } = this.state;
-    const url = 'http://buzzevents.co/public/uploads/';
-    const regex = 'appspot.com';
-    const urlValue = currentEvent.pic.includes(regex);
     return (
       <View>
         <ScrollView
@@ -248,19 +246,16 @@ class EventUpdate extends Component {
           contentContainerStyle={styles.container}
         >
           <View style={styles.topBar}>
-            <Text style={styles.barTitle}>
-              {/* {currentEvent ? currentEvent.name.substring(0, 25) : 'Event'} */}
-              Update Event
-            </Text>
+            <Text style={styles.barTitle}>Create Event</Text>
             <TouchableOpacity
               style={styles.goBack}
-              onPress={() => this.props.navigation.navigate('Home')}
+              onPress={() => this.navigateBack()}
             >
               <Icon name="home" size={40} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.update}
-              onPress={() => this.props.navigation.navigate('EventDetails')}
+              onPress={() => this.navigateBack()}
             >
               <Text style={styles.updateText}>Cancel</Text>
             </TouchableOpacity>
@@ -272,26 +267,25 @@ class EventUpdate extends Component {
             />
           ) : (
             <View style={styles.cardListing}>
-              <FastImage
-                style={styles.eventImage}
-                source={
-                  image.uri !== undefined
-                    ? {
-                        uri: image.uri
-                      }
-                    : urlValue
-                    ? { uri: currentEvent.pic }
-                    : { uri: url + currentEvent.pic }
-                }
-                resizeMode={FastImage.resizeMode.cover}
-              >
-                <TouchableOpacity
-                  style={styles.changePicture}
-                  onPress={() => this.pickSingle()}
-                >
-                  <Text>Update Image</Text>
-                </TouchableOpacity>
-              </FastImage>
+              {image && (
+                <FastImage
+                  style={styles.eventImage}
+                  source={{
+                    uri: image.uri
+                  }}
+                  resizeMode={FastImage.resizeMode.cover}
+                />
+              )}
+              {!image && (
+                <View style={styles.eventImage}>
+                  <TouchableOpacity
+                    style={styles.changePicture}
+                    onPress={() => this.pickSingle()}
+                  >
+                    <Text>Update Image</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
               <View style={styles.venueCell}>
                 <Text style={styles.cellTitleText}>Title</Text>
                 <TextInput
@@ -434,14 +428,4 @@ class EventUpdate extends Component {
   }
 }
 
-const mapStateToProps = ({ events, user }) => {
-  return {
-    user: user.currentUser,
-    currentEvent: events.currentEvent
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  null
-)(EventUpdate);
+export default EventCreate;

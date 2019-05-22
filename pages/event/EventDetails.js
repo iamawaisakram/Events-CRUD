@@ -45,6 +45,8 @@ class EventDetails extends Component {
   render() {
     const { currentEvent } = this.props;
     const url = 'http://buzzevents.co/public/uploads/';
+    const regex = 'appspot.com';
+    const urlValue = currentEvent.pic.includes(regex);
     return (
       <View>
         <ScrollView
@@ -75,7 +77,11 @@ class EventDetails extends Component {
             <View style={styles.cardListing}>
               <FastImage
                 style={styles.eventImage}
-                source={{ uri: url + currentEvent.pic }}
+                source={
+                  urlValue
+                    ? { uri: currentEvent.pic }
+                    : { uri: url + currentEvent.pic }
+                }
                 resizeMode={FastImage.resizeMode.cover}
               />
               <View style={styles.venueCell}>

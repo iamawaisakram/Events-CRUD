@@ -26,6 +26,7 @@ import Home from './pages/home/Home';
 //Card
 import EventDetails from './pages/event/EventDetails';
 import EventUpdate from './pages/event/EventUpdate';
+import EventCreate from './pages/event/EventCreate';
 
 //Sell product
 import Ad from './pages/adPage/Ad';
@@ -59,7 +60,8 @@ const AppStack = createSwitchNavigator(
     Ad,
     Home,
     EventDetails,
-    EventUpdate
+    EventUpdate,
+    EventCreate
   },
   {
     initialRouteName: 'SplashScreen',
