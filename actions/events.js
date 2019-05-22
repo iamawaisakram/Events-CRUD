@@ -19,22 +19,23 @@ async function callTokenOnError() {
     email: email,
     password: password
   };
+  return dispatch => {
+    return axios
+      .post(`http://buzzevents.co/public/api/auth/login`, data)
+      .then(async response => {
+        await firebase
+          .database()
+          .ref('users')
+          .child(userId)
+          .update({ token: response.data.token });
 
-  return axios
-    .post(`http://buzzevents.co/public/api/auth/login`, data)
-    .then(async response => {
-      await firebase
-        .database()
-        .ref('users')
-        .child(userId)
-        .update({ token: response.data.token });
-
-      await dispatch(setTokenValue(response.data.token));
-      getEvents(1, response.data.token);
-    })
-    .catch(error => {
-      throw error;
-    });
+        await dispatch(setTokenValue(response.data.token));
+        getEvents(1, response.data.token);
+      })
+      .catch(error => {
+        throw error;
+      });
+  };
 }
 
 export const setToken = (email, password, userId) => {
@@ -83,7 +84,16 @@ export const getEvents = (page = 1, token) => {
       .get(`http://buzzevents.co/public/api/events?page=${page}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
-      .then(response => {
+      .then(async response => {
+        const events = response.data.data.data;
+        events &&
+          events.map(async event => {
+            await firebase
+              .database()
+              .ref('events')
+              .child(`${event.id}`)
+              .update({ event });
+          });
         dispatch(setValues(response.data.data));
       })
       .catch(error => {

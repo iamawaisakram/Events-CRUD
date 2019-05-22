@@ -103,14 +103,14 @@ class CreateAccount extends Component {
         .then(async signedInUser => {
           await this.props.setUser(signedInUser);
           await AsyncStorage.setItem('uid', `${signedInUser.user.uid}`);
-          await this.props.setToken(
-            `${email}`,
-            `${password}`,
-            signedInUser.user.uid
-          );
-          if (this.props.token !== null) {
-            this.props.navigation.navigate('Home');
-          }
+          // await this.props.setToken(
+          //   `${email}`,
+          //   `${password}`,
+          //   signedInUser.user.uid
+          // );
+          // if (this.props.token !== null) {
+          //   this.props.navigation.navigate('Home');
+          // }
         })
 
         .catch(err => {
@@ -134,7 +134,7 @@ class CreateAccount extends Component {
       } catch (e) {
         // saving error
       }
-      await this.props.setRegisterToken(`${email}`, `${password}`);
+      // await this.props.setRegisterToken(`${email}`, `${password}`);
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
@@ -177,8 +177,8 @@ class CreateAccount extends Component {
     await AsyncStorage.setItem('uid', `${createdUser.user.uid}`);
     return this.state.usersRef.child(createdUser.user.uid).set({
       name: createdUser.user.displayName,
-      avatar: createdUser.user.photoURL,
-      token: this.props.token
+      avatar: createdUser.user.photoURL
+      // token: this.props.token
     });
   };
 

@@ -4,6 +4,9 @@ import * as Progress from 'react-native-progress';
 import FastImage from 'react-native-fast-image';
 import { connect } from 'react-redux';
 
+//Firebase
+import firebase from '../../components/firebase';
+
 //icons
 import Icon from 'react-native-vector-icons/AntDesign';
 
@@ -14,7 +17,8 @@ class EventDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true
+      loading: true,
+      eventRef: firebase.database().ref('events')
     };
   }
 
@@ -22,6 +26,20 @@ class EventDetails extends Component {
     if (this.props.currentEvent !== null) {
       this.setState({ loading: false });
     }
+  }
+
+  async deleteEvent() {
+    await this.setState({ loading: true });
+    await this.state.eventRef
+      .child(this.props.currentEvent.id)
+      .remove(async err => {
+        if (err !== null) {
+          alert(err.message);
+          await this.setState({ loading: false });
+          return false;
+        }
+      });
+    this.props.navigation.navigate('Home');
   }
 
   render() {
@@ -34,16 +52,17 @@ class EventDetails extends Component {
           contentContainerStyle={styles.container}
         >
           <View style={styles.topBar}>
-            <Text style={styles.barTitle}>
-              {currentEvent ? currentEvent.name.substring(0, 25) : 'Event'}
-            </Text>
+            <Text style={styles.barTitle} />
             <TouchableOpacity
               style={styles.goBack}
-              onPress={() => this.props.navigation.goBack()}
+              onPress={() => this.props.navigation.navigate('Home')}
             >
-              <Icon name="arrowleft" size={40} color="#fff" />
+              <Icon name="home" size={40} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.update}>
+            <TouchableOpacity
+              style={styles.update}
+              onPress={() => this.props.navigation.navigate('EventUpdate')}
+            >
               <Text style={styles.updateText}>Update</Text>
             </TouchableOpacity>
           </View>
@@ -59,6 +78,10 @@ class EventDetails extends Component {
                 source={{ uri: url + currentEvent.pic }}
                 resizeMode={FastImage.resizeMode.cover}
               />
+              <View style={styles.venueCell}>
+                <Text style={styles.cellTitleText}>Title</Text>
+                <Text style={styles.cellTitleText}>{currentEvent.name}</Text>
+              </View>
               <View style={styles.informationCell}>
                 <Text style={styles.cellTitleText}>Starting Date:</Text>
                 <Text style={styles.cellText}>{currentEvent.date_debut}</Text>
@@ -108,6 +131,14 @@ class EventDetails extends Component {
                   <Text style={styles.cellText}>{currentEvent.place.tel}</Text>
                 </View>
               </View>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => {
+                  this.deleteEvent();
+                }}
+              >
+                <Text style={styles.buttonText}>DELETE</Text>
+              </TouchableOpacity>
             </View>
           )}
         </ScrollView>
@@ -118,10 +149,7 @@ class EventDetails extends Component {
 
 const mapStateToProps = ({ events, user }) => {
   return {
-    token: events.token,
-    loading: events.loading,
     user: user.currentUser,
-    events: events.events,
     currentEvent: events.currentEvent
   };
 };

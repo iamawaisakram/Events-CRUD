@@ -4,7 +4,11 @@ import { AppRegistry } from 'react-native';
 import { name as appName } from './app.json';
 
 import React, { Component } from 'react';
-import { createAppContainer, createStackNavigator } from 'react-navigation';
+import {
+  createAppContainer,
+  createStackNavigator,
+  createSwitchNavigator
+} from 'react-navigation';
 import { Provider } from 'react-redux';
 
 //store
@@ -21,6 +25,7 @@ import Home from './pages/home/Home';
 
 //Card
 import EventDetails from './pages/event/EventDetails';
+import EventUpdate from './pages/event/EventUpdate';
 
 //Sell product
 import Ad from './pages/adPage/Ad';
@@ -47,13 +52,14 @@ class App extends Component {
 
 AppRegistry.registerComponent(appName, () => App);
 
-const AppStack = createStackNavigator(
+const AppStack = createSwitchNavigator(
   {
     SplashScreen,
     CreateAccount,
     Ad,
     Home,
-    EventDetails
+    EventDetails,
+    EventUpdate
   },
   {
     initialRouteName: 'SplashScreen',

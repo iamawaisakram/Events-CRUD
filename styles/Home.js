@@ -25,6 +25,20 @@ export default StyleSheet.create({
   cardListing: {
     alignItems: 'center'
   },
+  loadMoreButton: {
+    position: 'absolute',
+    width: wp('30%'),
+    height: hp('7%'),
+    bottom: hp('5%'),
+    borderRadius: hp('1%'),
+    backgroundColor: 'rgb(70, 56, 28)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  loadMoreText: {
+    color: '#fff',
+    fontSize: wp('4%')
+  },
   topBar: {
     height: hp('12%'),
     width: wp('100%'),
@@ -104,7 +118,7 @@ export default StyleSheet.create({
   },
   card: {
     width: wp('90%'),
-    height: hp('48%'),
+    height: hp('44%'),
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.3)',
     marginTop: hp('3%'),
@@ -137,11 +151,11 @@ export default StyleSheet.create({
   },
   cardImage: {
     height: hp('27%'),
-    width: wp('90%'),
+    width: wp('89.5%'),
     justifyContent: 'center'
   },
   cardDescription: {
-    height: hp('13%'),
+    height: hp('8%'),
     width: wp('90%'),
     justifyContent: 'center'
   },

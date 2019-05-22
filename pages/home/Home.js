@@ -33,22 +33,34 @@ class Home extends Component {
         .database()
         .ref('users')
         .child(firebase.auth().currentUser.uid),
-      eventsRef: firebase.database().ref('events')
+      eventsRef: firebase.database().ref('events'),
+      page: 1,
+      events: [],
+      loading: true
     };
     this.loadEvents();
   }
 
+  componentWillUnmount() {
+    this.state.eventsRef.off('child_added');
+  }
+
   async loadEvents() {
-    const email = await AsyncStorage.getItem('email');
-    const password = await AsyncStorage.getItem('password');
-    const userId = await AsyncStorage.getItem('uid');
+    // const email = await AsyncStorage.getItem('email');
+    // const password = await AsyncStorage.getItem('password');
+    // const userId = await AsyncStorage.getItem('uid');
 
-    console.log('called......', email, password, userId);
+    // console.log('called......', email, password, userId);
 
-    this.state.userRef.once('value').then(async data => {
-      if (data.val() !== null) {
-        await this.props.getEvents(1, data.val().token);
-      }
+    // this.state.userRef.once('value').then(async data => {
+    //   if (data.val() !== null) {
+    //     await this.props.getEvents(this.state.page, data.val().token);
+    //   }
+    // });
+    let loadedEvents = [];
+    this.state.eventsRef.on('child_added', snap => {
+      loadedEvents.push(snap.val());
+      this.setState({ events: loadedEvents, loading: false });
     });
   }
 
@@ -62,41 +74,52 @@ class Home extends Component {
     this.props.navigation.navigate('CreateAccount');
   }
 
+  // nextPage() {
+  //   this.state.userRef.once('value').then(async data => {
+  //     if (data.val() !== null) {
+  //       await this.props.getEvents(this.state.page + 1, data.val().token);
+  //       await this.setState({ page: this.state.page + 1 });
+  //     }
+  //   });
+  // }
+
   DisplayEvents(events) {
     const url = 'http://buzzevents.co/public/uploads/';
+
     return (
       events &&
       events.map((event, i) => {
+        const eventValue = event.event;
         return (
           <TouchableOpacity
             key={i}
             style={styles.card}
             onPress={async () => {
-              await this.props.setCurrentEvent(event);
+              await this.props.setCurrentEvent(eventValue);
               this.props.navigation.navigate('EventDetails');
             }}
           >
             <View style={styles.cardBar}>
               <FastImage
                 style={styles.cardLogo}
-                source={{ uri: url + event.logo }}
+                source={{ uri: url + eventValue.logo }}
                 resizeMode={FastImage.resizeMode.contain}
               />
               <View>
                 <Text style={styles.cardName}>
-                  {event.name.substring(0, 25)}
+                  {eventValue.name.substring(0, 25)}
                 </Text>
-                <Text style={styles.cardDate}>{event.date_debut}</Text>
+                <Text style={styles.cardDate}>{eventValue.date_debut}</Text>
               </View>
             </View>
             <FastImage
               style={styles.cardImage}
-              source={{ uri: url + event.pic }}
+              source={{ uri: url + eventValue.pic }}
               resizeMode={FastImage.resizeMode.contain}
             />
             <View style={styles.cardDescription}>
               <Text style={styles.cardDescriptionText}>
-                {event.description.substring(0, 100)}...
+                {eventValue.description.substring(0, 100)}...
               </Text>
             </View>
           </TouchableOpacity>
@@ -105,6 +128,11 @@ class Home extends Component {
     );
   }
   render() {
+    // const { currentPage, lastPage } = this.props;
+    // let loadMore = false;
+    // if (currentPage && lastPage) {
+    //   loadMore = this.props.currentPage < this.props.lastPage;
+    // }
     return (
       <View>
         <ScrollView
@@ -113,9 +141,6 @@ class Home extends Component {
         >
           <View style={styles.topBar}>
             <Text style={styles.barTitle}>Events</Text>
-            <TouchableOpacity style={styles.refereshEvents}>
-              <IonIcon name="ios-refresh" size={40} color="#fff" />
-            </TouchableOpacity>
             <TouchableOpacity style={styles.addEvent}>
               <Icon name="plussquare" size={40} color="#fff" />
             </TouchableOpacity>
@@ -128,14 +153,22 @@ class Home extends Component {
               <Text style={styles.signoutText}>Sign Out</Text>
             </TouchableOpacity>
           </View>
-          {this.props.loading ? (
+          {this.state.loading ? (
             <Progress.CircleSnail
               style={styles.loading}
               color={['red', 'green', 'blue']}
             />
           ) : (
             <View style={styles.cardListing}>
-              {this.DisplayEvents(this.props.events)}
+              {this.state.events[0] && this.DisplayEvents(this.state.events)}
+              {/* {loadMore && (
+                <TouchableOpacity
+                  style={styles.loadMoreButton}
+                  onPress={() => this.nextPage()}
+                >
+                  <Text style={styles.loadMoreText}>Load More</Text>
+                </TouchableOpacity>
+              )} */}
             </View>
           )}
         </ScrollView>
@@ -149,7 +182,9 @@ const mapStateToProps = ({ events, user }) => {
     token: events.token,
     loading: events.loading,
     user: user.currentUser,
-    events: events.events
+    events: events.events,
+    currentPage: events.currentPage,
+    lastPage: events.lastPage
   };
 };
 

@@ -115,5 +115,28 @@ export default StyleSheet.create({
     textAlign: 'left',
     fontSize: wp('3.5%'),
     fontWeight: '300'
+  },
+  deleteButton: {
+    width: wp('50%'),
+    height: hp('5%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'red',
+    marginBottom: 25,
+    borderRadius: wp('3%')
+  },
+  updateButton: {
+    width: wp('50%'),
+    height: hp('5%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'green',
+    marginBottom: 25,
+    borderRadius: wp('3%')
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: wp('4%'),
+    fontWeight: '700'
   }
 });
