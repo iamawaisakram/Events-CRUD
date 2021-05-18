@@ -15,7 +15,7 @@
     "react": "16.8.3",
     "react-native": "0.59.8",
     "react-native-date-picker": "^2.4.1",
-    "react-native-fast-image": "^6.0.0",
+    "react-native-fast-image": "^8.3.0",
     "react-native-gesture-handler": "^1.2.1",
     "react-native-image-crop-picker": "^0.24.1",
     "react-native-modal-selector": "^1.0.3",
